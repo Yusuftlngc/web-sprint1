@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Etkinlik Ekle</title>
+
+    <link rel="stylesheet" href="css/2321032005.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Etkinlik Ekle</h1>
+
+        <nav>
+            <a href="index.html">Ana Sayfa</a>
+            <a href="etkinlikler.html">Etkinlikler</a>
+            <a href="etkinlik-ekle.html">Ekle</a>
+            <a href="etkinlik-guncelle.html">Güncelle</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <form>
+
+            <div class="form-alani">
+                <label for="etkinlikAdi">Etkinlik adı</label>
+
+                <input
+                    type="text"
+                    id="etkinlikAdi"
+                    name="etkinlikAdi"
+                    required>
+            </div>
+
+            <div class="form-alani">
+                <label for="kategori">Kategori</label>
+
+                <select
+                    id="kategori"
+                    name="kategori"
+                    required>
+
+                    <option value="">Seçiniz</option>
+                    <option value="seminer">Seminer</option>
+                    <option value="atolye">Atölye</option>
+                    <option value="soylesi">Söyleşi</option>
+
+                </select>
+            </div>
+
+            <div class="form-alani">
+                <label for="tarih">Tarih</label>
+
+                <input
+                    type="date"
+                    id="tarih"
+                    name="tarih"
+                    required>
+            </div>
+
+            <div class="form-alani">
+                <label for="aciklama">Açıklama</label>
+
+                <textarea
+                    id="aciklama"
+                    name="aciklama"
+                    rows="4"
+                    required></textarea>
+            </div>
+
+            <button type="submit">Kaydet</button>
+
+        </form>
+
+    </main>
+
+    <footer>
+        <p>Yusuf Tolunç - 2026</p>
+    </footer>
+
+</body>
+
+</html>
