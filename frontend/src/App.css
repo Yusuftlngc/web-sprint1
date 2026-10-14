@@ -1,0 +1,238 @@
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+  margin: 0;
+  background-color: #f5f7f6;
+  color: #222;
+  font-family: "Times New Roman", serif;
+}
+
+
+
+header {
+
+  background-color: #1f6f43;
+
+  color: white;
+
+  padding: 25px;
+
+}
+
+
+
+header h1 {
+
+  margin: 0 0 15px;
+
+}
+
+
+
+nav {
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 15px;
+
+}
+
+
+
+nav a {
+
+  color: white;
+
+  text-decoration: none;
+
+  font-weight: bold;
+
+}
+
+
+
+nav a:hover {
+
+  text-decoration: underline;
+
+}
+
+
+
+
+main {
+
+  width: min(100% - 40px, 1000px);
+
+  margin: auto;
+
+  padding: 30px 0;
+
+}
+
+
+
+h2 {
+
+  color: #1f6f43;
+
+}
+
+
+
+
+
+.etkinlik-listesi {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+
+}
+
+
+
+
+
+.kart {
+
+  background-color: white;
+
+  border: 1px solid #ddd;
+
+  border-radius: 10px;
+
+  padding: 20px;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+}
+
+
+
+
+
+.kart h3 {
+
+  margin-top: 0;
+
+  color: #1f6f43;
+
+}
+
+
+
+
+
+button {
+
+  background-color: #1f6f43;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 6px;
+
+  padding: 10px 16px;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+}
+
+
+
+
+
+button:hover {
+
+  background-color: #155233;
+
+}
+
+
+
+
+
+input,
+select,
+textarea {
+
+  width: 100%;
+
+  padding: 10px;
+
+  margin: 8px 0 15px;
+
+  border: 1px solid #aaa;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+
+}
+
+
+
+
+
+form.kart {
+
+  display: grid;
+
+  gap: 5px;
+
+}
+
+
+
+
+
+footer {
+
+  width: min(100% - 40px, 1000px);
+
+  margin: 30px auto;
+
+  color: #555;
+
+}
+
+
+
+
+
+@media(max-width:700px){
+
+
+  .etkinlik-listesi {
+
+    grid-template-columns: 1fr;
+
+  }
+
+
+  nav {
+
+    flex-direction: column;
+
+  }
+
+
+  button {
+
+    width: 100%;
+
+  }
+
+
+}
