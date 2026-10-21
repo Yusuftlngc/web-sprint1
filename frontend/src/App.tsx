@@ -2,43 +2,37 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 import { events } from "./data/events";
-import { filterEvents } from "./utils/filter-events";
 
+import type { PageName } from "./types/page";
 
-type Page =
-  | "home"
-  | "events"
-  | "detail"
-  | "form";
+import {
+  filterEvents
+} from "./utils/filter-events";
+
+import Header from "./components/layout/Header";
+import Navigation from "./components/layout/Navigation";
+import Footer from "./components/layout/Footer";
+
+import EventList from "./components/events/EventList";
+import EventFilter from "./components/events/EventFilter";
+import EventDetail from "./components/events/EventDetail";
+
+import EventForm from "./components/forms/EventForm";
 
 
 function App() {
 
-
-  useEffect(() => {
-
-    document.title = "Kampüs Etkinlikleri";
-
-  }, []);
-
-
-
-  const [page, setPage] = useState<Page>("home");
-
-
-  const [searchText, setSearchText] = useState("");
-
-
-  const [category, setCategory] = useState("Tümü");
-
+  const [page, setPage] =
+    useState<PageName>("home");
 
   const [selectedId, setSelectedId] =
     useState<string | null>(null);
 
+  const [searchText, setSearchText] =
+    useState("");
 
-  const [formType, setFormType] =
-    useState<"add" | "update">("add");
-
+  const [category, setCategory] =
+    useState("Tümü");
 
 
   const categories = [
@@ -49,29 +43,33 @@ function App() {
   ];
 
 
-
-  const filteredEvents = filterEvents(
+  const filtered = filterEvents(
     events,
     searchText,
     category
   );
 
 
+  const upcoming = [...events]
+    .sort((a, b) =>
+      a.date.localeCompare(b.date)
+    )
+    .slice(0, 2);
 
-  const selectedEvent = events.find(
-    (event) => event.id === selectedId
-  );
 
-
+  const selected = selectedId
+    ? events.find(
+        (event) => event.id === selectedId
+      )
+    : undefined;
 
 
   function go(
-    nextPage: Page,
+    nextPage: PageName,
     id?: string
   ) {
 
     setPage(nextPage);
-
 
     if (id) {
       setSelectedId(id);
@@ -80,434 +78,155 @@ function App() {
   }
 
 
+  let title = "Kampüs Etkinlikleri";
+
+  let text =
+    "Fakültedeki seminer, atölye ve söyleşileri tek yerden takip edin.";
 
 
-  function EventCard({
-    event
-  }: {
-    event: typeof events[number]
-  }) {
-
-
-    return (
-
-      <article className="kart">
-
-
-        <h3>
-          {event.title}
-        </h3>
-
-
-        <p>
-          <b>Kategori:</b> {event.category}
-        </p>
-
-
-        <p>
-          <b>Tarih:</b> {event.date}
-        </p>
-
-
-        <p>
-          <b>Saat:</b> {event.time}
-        </p>
-
-
-        <p>
-          <b>Yer:</b> {event.location}
-        </p>
-
-
-        <p>
-          {event.description}
-        </p>
-
-
-
-        <button
-          onClick={() =>
-            go("detail", event.id)
-          }
-        >
-          Detayları gör
-        </button>
-
-
-      </article>
-
-    );
-
+  if (page === "events") {
+    title = "Tüm Etkinlikler";
+    text = "Etkinlikleri arayın ve kategoriye göre filtreleyin.";
   }
 
 
-
-
-
-  function FormPage() {
-
-    return (
-
-      <form className="kart">
-
-
-        <h2>
-
-          {
-            formType === "add"
-              ? "Etkinlik Ekle"
-              : "Etkinlik Güncelle"
-          }
-
-        </h2>
-
-
-
-        <label>
-          Etkinlik adı
-        </label>
-
-        <input />
-
-
-
-        <label>
-          Kategori
-        </label>
-
-        <select>
-
-          <option>
-            Seminer
-          </option>
-
-          <option>
-            Atölye
-          </option>
-
-          <option>
-            Söyleşi
-          </option>
-
-        </select>
-
-
-
-        <label>
-          Tarih
-        </label>
-
-        <input type="date" />
-
-
-
-        <label>
-          Saat
-        </label>
-
-        <input type="time" />
-
-
-
-        <label>
-          Yer
-        </label>
-
-        <input />
-
-
-
-        <label>
-          Açıklama
-        </label>
-
-        <textarea />
-
-
-
-        <button type="button">
-          Kaydet
-        </button>
-
-
-      </form>
-
-    );
-
+  if (page === "detail" && selected) {
+    title = selected.title;
+    text = undefined as unknown as string;
   }
 
 
+  if (page === "add") {
+    title = "Etkinlik Ekle";
+    text =
+      "Bu sprintte form sadece görünüm; kayıt yapılmaz.";
+  }
 
 
+  if (page === "update") {
+    title = "Etkinlik Güncelle";
+    text =
+      "Bu sprintte form sadece görünüm; kayıt yapılmaz.";
+  }
+
+
+  useEffect(() => {
+
+    document.title =
+      page === "detail" && selected
+        ? `Kampüs Etkinlikleri - ${selected.title}`
+        : title;
+
+  }, [page, selected, title]);
 
 
   return (
-
     <>
 
+      <Header
+        title={title}
+        text={text}
+      />
 
-      <header>
-
-
-        <h1>
-          Kampüs Etkinlikleri
-        </h1>
-
-
-
-        <nav>
-
-
-          <a
-            href="#"
-            onClick={(e) => {
-
-              e.preventDefault();
-
-              go("home");
-
-            }}
-          >
-            Ana Sayfa
-          </a>
-
-
-
-          <a
-            href="#"
-            onClick={(e) => {
-
-              e.preventDefault();
-
-              go("events");
-
-            }}
-          >
-            Etkinlikler
-          </a>
-
-
-
-          <a
-            href="#"
-            onClick={(e) => {
-
-              e.preventDefault();
-
-              setFormType("add");
-
-              go("form");
-
-            }}
-          >
-            Ekle
-          </a>
-
-
-
-        </nav>
-
-
-      </header>
-
-
-
+      <Navigation
+        current={page}
+        onNavigate={(nextPage) =>
+          go(nextPage)
+        }
+      />
 
 
       <main>
 
-
-        {
-          page === "home" && (
-
-            <>
-
-              <h2>
-                Yaklaşan Etkinlikler
-              </h2>
-
-
-              <section className="etkinlik-listesi">
-
-                {
-                  events
-                    .slice(0, 2)
-                    .map((event) => (
-
-                      <EventCard
-                        key={event.id}
-                        event={event}
-                      />
-
-                    ))
-                }
-
-              </section>
-
-
-            </>
-
-          )
-        }
-
-
-
-
-
-
-
-        {
-          page === "events" && (
-
-            <>
-
-              <h2>
-                Tüm Etkinlikler
-              </h2>
-
-
-              <input
-                placeholder="Etkinlik ara"
-                value={searchText}
-                onChange={(e) =>
-                  setSearchText(e.target.value)
-                }
-              />
-
-
-
-              <select
-                value={category}
-                onChange={(e) =>
-                  setCategory(e.target.value)
-                }
-              >
-
-                {
-                  categories.map((cat) => (
-
-                    <option key={cat}>
-                      {cat}
-                    </option>
-
-                  ))
-                }
-
-              </select>
-
-
-
-
-              <section className="etkinlik-listesi">
-
-                {
-                  filteredEvents.map((event) => (
-
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                    />
-
-                  ))
-                }
-
-              </section>
-
-
-            </>
-
-          )
-        }
-
-
-
-
-
-
-
-        {
-          page === "detail" &&
-          selectedEvent && (
-
-            <article className="kart">
-
-
-              <h2>
-                {selectedEvent.title}
-              </h2>
-
-
-              <p>
-                {selectedEvent.description}
-              </p>
-
-
-              <p>
-                {selectedEvent.location}
-              </p>
-
-
-
-              <button
-                onClick={() => {
-
-                  setFormType("update");
-
-                  go(
-                    "form",
-                    selectedEvent.id
-                  );
-
-                }}
-              >
-                Güncelle
-              </button>
-
-
-
-              <button
-                onClick={() =>
-                  go("home")
-                }
-              >
-                Listeye dön
-              </button>
-
-
-            </article>
-
-          )
-        }
-
-
-
-
-
-
-
-        {
-          page === "form" &&
-          <FormPage />
-        }
-
-
+        {page === "home" && (
+          <>
+            <h2>
+              Yaklaşan 2 Etkinlik
+            </h2>
+
+            <EventList
+              events={upcoming}
+              onShowDetail={(id) =>
+                go("detail", id)
+              }
+            />
+
+            <button
+              type="button"
+              onClick={() =>
+                go("events")
+              }
+            >
+              Tüm etkinlikleri gör
+            </button>
+          </>
+        )}
+
+
+        {page === "events" && (
+          <>
+            <EventFilter
+              searchText={searchText}
+              category={category}
+              categories={categories}
+              onSearchChange={setSearchText}
+              onCategoryChange={setCategory}
+            />
+
+            <p className="sonuc">
+              {filtered.length} etkinlik listeleniyor.
+            </p>
+
+            <EventList
+              events={filtered}
+              onShowDetail={(id) =>
+                go("detail", id)
+              }
+              emptyText="Aramanıza uygun etkinlik bulunamadı."
+            />
+          </>
+        )}
+
+
+        {page === "detail" && selected && (
+          <EventDetail
+            event={selected}
+            onBack={() =>
+              go("events")
+            }
+            onEdit={(id) =>
+              go("update", id)
+            }
+          />
+        )}
+
+
+        {page === "add" && (
+          <EventForm
+            title="Etkinlik Ekle"
+            onSubmit={() =>
+              window.scrollTo(0, 0)
+            }
+          />
+        )}
+
+
+        {page === "update" && selected && (
+          <EventForm
+            title="Etkinlik Güncelle"
+            onSubmit={() =>
+              window.scrollTo(0, 0)
+            }
+          />
+        )}
 
       </main>
 
 
-
-
-      <footer>
-        Yusuf Tolunç - 2026
-      </footer>
-
-
+      <Footer />
 
     </>
-
   );
-
 }
-
 
 export default App;

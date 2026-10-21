@@ -1,18 +1,25 @@
 import type { CampusEvent } from "../types/campus-event";
 
-
 export function filterEvents(
   events: CampusEvent[],
   searchText: string,
   category: string
-) {
+): CampusEvent[] {
+
+  const search = searchText
+    .trim()
+    .toLocaleLowerCase("tr-TR");
 
   return events.filter((event) => {
 
-    const searchMatch =
+    const textMatch =
       event.title
-        .toLowerCase()
-        .includes(searchText.toLowerCase());
+        .toLocaleLowerCase("tr-TR")
+        .includes(search) ||
+
+      event.description
+        .toLocaleLowerCase("tr-TR")
+        .includes(search);
 
 
     const categoryMatch =
@@ -20,7 +27,7 @@ export function filterEvents(
       event.category === category;
 
 
-    return searchMatch && categoryMatch;
+    return textMatch && categoryMatch;
 
   });
 
