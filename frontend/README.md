@@ -4,9 +4,9 @@ Yusuf Tolungüç — React, TypeScript ve React Router ile kampüs etkinlikleri 
 
 ## Canlı yayın
 
-Depoda kayıtlı önceki yayın adresi: https://web-sprint1-liart.vercel.app/
+[Canlı site — Kampüs Etkinlikleri](https://yusuftolunguc-frontend.vercel.app/)
 
-Sprint 6 sürümü henüz GitHub/Vercel'e gönderilmedi. Yayın sonrasında güncel adres doğrulanmalı; teslim yönergesindeki `isimsoyisim-frontend.vercel.app` biçimindeki alan adı Vercel'de ayarlanmalıdır.
+[GitHub deposu](https://github.com/Yusuftlngc/web-sprint1)
 
 ## Kurulum ve çalıştırma
 
@@ -62,6 +62,8 @@ npm run preview
 - Output Directory: `dist`
 - `vercel.json`, alt sayfaları doğrudan açarken ve yenilerken uygulamaya yönlendirir.
 
-## Teslim öncesi
+## Git sürümü ve teslim
 
-Yerel kontrollerden sonra GitHub'a gönderim ve Vercel yayını için kullanıcı onayı alınmalıdır. Yönergedeki commit mesajı: `Complete sprint 6 and midterm frontend`; tag: `frontend`. Yayın sonrasında README dosyalarındaki canlı adres doğrulanıp güncellenmelidir.
+Sprint 6 ve vize uygulaması `Complete sprint 6 and midterm frontend` commit mesajıyla kaydedilmiştir. Bu sürümün etiketi `frontend` olarak GitHub'a gönderilmiştir.
+
+Teslim bağlantısı: https://github.com/Yusuftlngc/web-sprint1
