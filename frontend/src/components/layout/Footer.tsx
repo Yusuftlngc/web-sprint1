@@ -1,7 +1,7 @@
 function Footer() {
   return (
     <footer>
-      Yusuf Tolunç - 2026
+      Yusuf Tolungüç - 2026
     </footer>
   );
 }

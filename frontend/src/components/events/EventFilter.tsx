@@ -23,6 +23,7 @@ function EventFilter({
 
         <input
           id="search"
+          name="search"
           type="search"
           placeholder="Örn. atölye, kariyer"
           value={searchText}
@@ -40,6 +41,7 @@ function EventFilter({
 
         <select
           id="category"
+          name="category"
           value={category}
           onChange={(e) =>
             onCategoryChange(e.target.value)

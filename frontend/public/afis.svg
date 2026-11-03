@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="400" viewBox="0 0 960 400" role="img" aria-labelledby="title desc">
+  <title id="title">Kampüs Etkinlikleri</title>
+  <desc id="desc">Seminer, atölye ve söyleşiler için yeşil kampüs etkinlikleri afişi.</desc>
+  <rect width="960" height="400" rx="20" fill="#1f6f43"/>
+  <circle cx="880" cy="70" r="160" fill="#2d8053"/>
+  <circle cx="940" cy="350" r="140" fill="#155233"/>
+  <text x="60" y="100" fill="#d9efde" font-family="Georgia,serif" font-size="24">BİRLİKTE ÖĞREN, BİRLİKTE ÜRET</text>
+  <text x="60" y="190" fill="white" font-family="Georgia,serif" font-size="60" font-weight="bold">Kampüs Etkinlikleri</text>
+  <text x="60" y="260" fill="white" font-family="Georgia,serif" font-size="28">Seminer · Atölye · Söyleşi · Yarışma</text>
+  <text x="60" y="340" fill="#d9efde" font-family="Georgia,serif" font-size="24">2026</text>
+</svg>

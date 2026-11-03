@@ -1,75 +1,67 @@
-# React + TypeScript + Vite
+# Kampüs Etkinlikleri — Sprint 6 ve Vize
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Yusuf Tolungüç — React, TypeScript ve React Router ile kampüs etkinlikleri uygulaması.
 
-Currently, two official plugins are available:
+## Canlı yayın
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Depoda kayıtlı önceki yayın adresi: https://web-sprint1-liart.vercel.app/
 
-## React Compiler
+Sprint 6 sürümü henüz GitHub/Vercel'e gönderilmedi. Yayın sonrasında güncel adres doğrulanmalı; teslim yönergesindeki `isimsoyisim-frontend.vercel.app` biçimindeki alan adı Vercel'de ayarlanmalıdır.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Kurulum ve çalıştırma
 
-## Expanding the ESLint configuration
+Node.js 24.15 veya üzeri bir 24.x sürümü önerilir (22.x için en az 22.22.2). Depo kökünden:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+cd frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Derleme ve kod denetimi:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```sh
+npm run build
+npm run lint
+npm test
+npm run preview
 ```
+
+## Sayfalar (10 route)
+
+| Adres | Sayfa |
+| --- | --- |
+| `/` | Yaklaşan 2 etkinlik |
+| `/events` | Arama ve kategori filtresi ile tüm etkinlikler |
+| `/events/:id` | Etkinlik detayı |
+| `/login` | Giriş formu (demo) |
+| `/register` | Kayıt formu (demo) |
+| `/forgot-password` | Şifre yenileme formu (demo) |
+| `/admin` | Etkinlik yönetimi |
+| `/admin/new` | Etkinlik ekleme |
+| `/admin/:id/edit` | Etkinlik güncelleme |
+| `*` | Sayfa bulunamadı |
+
+## Davranışlar
+
+- Etkinlikler `EventsContext` ve `useEvents` ile tüm ilgili sayfalarda paylaşılır.
+- Yeni etkinlik eklenir; mevcut etkinlik düzenlenir; silme öncesi onay istenir.
+- İşlemler Ana Sayfa, Etkinlikler, Detay ve Yönetim sayfalarına anında yansır.
+- Veriler sadece bellekte tutulur. Sayfa yenilenince başlangıç verilerine dönülür.
+- Etkinlik formu: ad en az 3 karakter, kategori seçili, tarih/saat/yer dolu, kontenjan 1–1000 arası tam sayı, açıklama en az 10 karakter.
+- Giriş/kayıt/şifre yenileme formları yalnızca demo doğrulaması yapar. Hesap açılmaz, oturum başlatılmaz, e-posta gönderilmez.
+- E-posta kuralı `@` içerme; şifre kuralı en az 6 karakterdir. Kayıtta ad soyad en az 3 karakter, iki şifre aynı olmalıdır.
+- Yönetim tablosu 699 px ve altında kartlara dönüşür.
+- Geçersiz etkinlik ve düzenleme adreslerinde bulunamadı sayfası açılır.
+
+## Vercel ayarları
+
+- Framework: Vite
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- `vercel.json`, alt sayfaları doğrudan açarken ve yenilerken uygulamaya yönlendirir.
+
+## Teslim öncesi
+
+Yerel kontrollerden sonra GitHub'a gönderim ve Vercel yayını için kullanıcı onayı alınmalıdır. Yönergedeki commit mesajı: `Complete sprint 6 and midterm frontend`; tag: `frontend`. Yayın sonrasında README dosyalarındaki canlı adres doğrulanıp güncellenmelidir.

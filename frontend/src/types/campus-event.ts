@@ -1,8 +1,6 @@
-export type Category =
-  | "Seminer"
-  | "Atölye"
-  | "Söyleşi"
-  | "Yarışma";
+export const EVENT_CATEGORIES = ["Seminer", "Atölye", "Söyleşi", "Yarışma"] as const;
+
+export type Category = (typeof EVENT_CATEGORIES)[number];
 
 export interface CampusEvent {
   id: string;
@@ -15,3 +13,10 @@ export interface CampusEvent {
   description: string;
   image?: string;
 }
+
+export type EventFormData = Omit<CampusEvent, "id" | "capacity" | "category"> & {
+  capacity: string;
+  category: Category | "";
+};
+
+export type EventFormErrors = Partial<Record<keyof EventFormData, string>>;
