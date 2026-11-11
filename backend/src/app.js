@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import eventRoutes from "./routes/event-routes.js";
 
 const app = express();
 
@@ -13,5 +14,7 @@ app.get("/health", (_req, res) => {
     student: "2321032005",
   });
 });
+
+app.use("/events", eventRoutes);
 
 export default app;
