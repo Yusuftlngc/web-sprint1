@@ -17,4 +17,12 @@ app.get("/health", (_req, res) => {
 
 app.use("/events", eventRoutes);
 
+app.use((error, _req, res, next) => {
+  if (error.type === "entity.parse.failed") {
+    return res.status(400).json({ error: { message: "Invalid JSON body" } });
+  }
+
+  next(error);
+});
+
 export default app;

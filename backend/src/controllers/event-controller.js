@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { events } from "../data/events.js";
 
 export function getEvents(req, res) {
@@ -17,4 +18,28 @@ export function getEventById(req, res) {
   }
 
   res.json(event);
+}
+
+export function createEvent(req, res) {
+  const { title, category, date, capacity, time, location, description } = req.body ?? {};
+
+  if (![title, category, date].every((value) => typeof value === "string" && value.trim())) {
+    return res.status(400).json({
+      error: { message: "title, category and date are required" },
+    });
+  }
+
+  const event = {
+    id: `event-${randomUUID()}`,
+    title: title.trim(),
+    category: category.trim(),
+    date: date.trim(),
+    capacity: Number(capacity) || 0,
+    time: time ?? "",
+    location: location ?? "",
+    description: description ?? "",
+  };
+
+  events.push(event);
+  res.location(`/events/${event.id}`).status(201).json(event);
 }
