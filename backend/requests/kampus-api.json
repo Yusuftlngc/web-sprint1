@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "Kampüs API",
+    "description": "Sprint 7’nin altı teslim isteği. Koleksiyonu, yeni başlatılmış bir API sürecinde sırayla çalıştırın.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 Health",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"JSON yanıtı REST sözleşmesine uyar\", () => {",
+              "  pm.response.to.be.json;",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.status).to.equal(\"ok\");",
+              "  pm.expect(body.student).to.equal(\"2321032005\");",
+              "  pm.expect(body.time).to.be.a(\"string\");",
+              "  pm.expect(new Date(body.time).toISOString()).to.equal(body.time);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2 Etkinlik listesi",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"JSON yanıtı REST sözleşmesine uyar\", () => {",
+              "  pm.response.to.be.json;",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.be.an(\"array\").with.lengthOf(6);",
+              "  pm.expect(body.map((event) => event.id)).to.have.members([\"event-1\", \"event-2\", \"event-3\", \"event-4\", \"event-5\", \"event-6\"]);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3 Tek etkinlik",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"JSON yanıtı REST sözleşmesine uyar\", () => {",
+              "  pm.response.to.be.json;",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.id).to.equal(\"event-2\");",
+              "  pm.expect(body.category).to.equal(\"Atölye\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/events/event-2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            "event-2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4 Olmayan etkinlik (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => {",
+              "  pm.response.to.have.status(404);",
+              "});",
+              "pm.test(\"JSON yanıtı REST sözleşmesine uyar\", () => {",
+              "  pm.response.to.be.json;",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.error.message).to.equal(\"Event not found\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/events/yok",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events",
+            "yok"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5 Etkinlik oluştur (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"JSON yanıtı REST sözleşmesine uyar\", () => {",
+              "  pm.response.to.be.json;",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.id).to.match(/^event-/);",
+              "  const submitted = JSON.parse(pm.request.body.raw);",
+              "  pm.expect(body).to.include(submitted);",
+              "  pm.expect(pm.response.headers.get(\"Location\")).to.equal(\"/events/\" + body.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Git Geçmişi ve Kod İnceleme Atölyesi\",\n  \"category\": \"Atölye\",\n  \"date\": \"2026-12-10\",\n  \"capacity\": 28,\n  \"time\": \"14:00\",\n  \"location\": \"Yazılım Laboratuvarı B-204\",\n  \"description\": \"Katılımcılar küçük bir değişikliği commit edip eşli kod incelemesi yapacak.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6 Eksik veri (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"JSON yanıtı REST sözleşmesine uyar\", () => {",
+              "  pm.response.to.be.json;",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.error.message).to.equal(\"title, category and date are required\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Eksik etkinlik\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/events",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "events"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

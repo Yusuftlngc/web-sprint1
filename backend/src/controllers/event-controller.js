@@ -29,15 +29,16 @@ export function createEvent(req, res) {
     });
   }
 
+  const parsedCapacity = ["number", "string"].includes(typeof capacity) ? Number(capacity) : 0;
   const event = {
     id: `event-${randomUUID()}`,
     title: title.trim(),
     category: category.trim(),
     date: date.trim(),
-    capacity: Number(capacity) || 0,
-    time: time ?? "",
-    location: location ?? "",
-    description: description ?? "",
+    capacity: Number.isFinite(parsedCapacity) ? parsedCapacity : 0,
+    time: typeof time === "string" ? time : "",
+    location: typeof location === "string" ? location : "",
+    description: typeof description === "string" ? description : "",
   };
 
   events.push(event);
