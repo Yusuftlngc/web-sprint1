@@ -1,46 +1,123 @@
-import { randomUUID } from "node:crypto";
-import { events } from "../data/events.js";
 
-export function getEvents(req, res) {
-  const { category } = req.query;
-  const results = category
-    ? events.filter((event) => event.category === category)
-    : events;
+import mongoose from "mongoose";
+import Event from "../models/event-model.js";
 
-  res.json(results);
+function formatEvent(event) {
+  const data = event.toObject();
+
+  return {
+    ...data,
+    id: event._id.toString(),
+  };
 }
 
-export function getEventById(req, res) {
-  const event = events.find(({ id }) => id === req.params.id);
+// GET /events
+export async function getEvents(req, res) {
+  try {
+    const { category } = req.query;
 
-  if (!event) {
-    return res.status(404).json({ error: { message: "Event not found" } });
-  }
+    const filter = category ? { category } : {};
 
-  res.json(event);
-}
+    const events = await Event.find(filter).sort({
+      date: 1,
+    });
 
-export function createEvent(req, res) {
-  const { title, category, date, capacity, time, location, description } = req.body ?? {};
+    res.status(200).json(events.map(formatEvent));
+  } catch (error) {
+    console.error(error);
 
-  if (![title, category, date].every((value) => typeof value === "string" && value.trim())) {
-    return res.status(400).json({
-      error: { message: "title, category and date are required" },
+    res.status(500).json({
+      error: {
+        message: "Etkinlikler getirilemedi",
+      },
     });
   }
+}
 
-  const parsedCapacity = ["number", "string"].includes(typeof capacity) ? Number(capacity) : 0;
-  const event = {
-    id: `event-${randomUUID()}`,
-    title: title.trim(),
-    category: category.trim(),
-    date: date.trim(),
-    capacity: Number.isFinite(parsedCapacity) ? parsedCapacity : 0,
-    time: typeof time === "string" ? time : "",
-    location: typeof location === "string" ? location : "",
-    description: typeof description === "string" ? description : "",
-  };
+// GET /events/:id
+export async function getEventById(req, res) {
+  try {
+    const { id } = req.params;
 
-  events.push(event);
-  res.location(`/events/${event.id}`).status(201).json(event);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(404).json({
+        error: {
+          message: "Event not found",
+        },
+      });
+    }
+
+    const event = await Event.findById(id);
+
+    if (!event) {
+      return res.status(404).json({
+        error: {
+          message: "Event not found",
+        },
+      });
+    }
+
+    res.status(200).json(formatEvent(event));
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: {
+        message: "Etkinlik getirilemedi",
+      },
+    });
+  }
+}
+
+// POST /events
+export async function createEvent(req, res) {
+  try {
+    const {
+      title,
+      category,
+      date,
+      time,
+      location,
+      capacity,
+      description,
+      image,
+    } = req.body ?? {};
+
+    if (!title || !category || !date) {
+      return res.status(400).json({
+        error: {
+          message: "title, category and date are required",
+        },
+      });
+    }
+
+    const event = await Event.create({
+      title,
+      category,
+      date,
+      time,
+      location,
+      capacity,
+      description,
+      image,
+    });
+
+    res.status(201).json(formatEvent(event));
+  } catch (error) {
+    console.error(error);
+
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        error: {
+          message: error.message,
+        },
+      });
+    }
+
+    res.status(500).json({
+      error: {
+        message: "Etkinlik oluşturulamadı",
+      },
+    });
+  }
 }

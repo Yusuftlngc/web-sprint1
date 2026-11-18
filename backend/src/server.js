@@ -1,8 +1,19 @@
+
 import "dotenv/config";
 import app from "./app.js";
+import { connectDatabase } from "./config/database.js";
 
-const port = Number(process.env.PORT || 3000);
+const PORT = process.env.PORT || 3000;
 
-app.listen(port, () => {
-  console.log(`Kampüs API http://localhost:${port} adresinde çalışıyor.`);
-});
+try {
+  await connectDatabase();
+
+  app.listen(PORT, () => {
+    console.log(
+      `Kampüs API http://localhost:${PORT} adresinde çalışıyor.`
+    );
+  });
+} catch (error) {
+  console.error("MongoDB bağlantı hatası:", error.message);
+  process.exit(1);
+}
