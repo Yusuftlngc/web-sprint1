@@ -1,56 +1,139 @@
-# Kampüs Etkinlikleri API — Sprint 7
 
-Node.js ve Express ile çalışan REST API. Başlangıç verisi altı kampüs etkinliği içerir. Yeni kayıtlar sunucu belleğinde tutulur. Sunucu yeniden başladığında başlangıç verileri yüklenir.
+# Kampüs Etkinlikleri API — Sprint 9
+
+Node.js, Express, MongoDB Atlas ve Mongoose ile geliştirilen
+REST API projesidir.
+
+Etkinlikler MongoDB veritabanında kalıcı olarak saklanır.
+Sprint 9 ile tam CRUD, arama, kategori filtreleme ve yaklaşan
+etkinlikleri listeleme özellikleri eklenmiştir.
 
 ## Kurulum ve çalıştırma
-
-Depo kökünde PowerShell ile çalıştırın.
 
 ```powershell
 cd backend
 npm install
 Copy-Item .env.example .env
+```
+
+.env dosyasındaki MONGODB_URI alanına kendi MongoDB bağlantı
+adresinizi yazın.
+
+```powershell
+npm run seed
 npm run dev
 ```
 
-`npm run dev` dosya değişikliklerinde sunucuyu yeniden başlatır. İzleme olmadan başlatmak için `npm start` kullanın. `.env` içindeki `PORT` değerini değiştirebilirsiniz. Varsayılan adres `http://localhost:3000`.
+Varsayılan API adresi: http://localhost:3000
+
+Seed işlemi veritabanını temizleyerek 6 başlangıç etkinliği ekler.
+Bu etkinliklerin 2 tanesi geçmiş tarihlidir.
 
 ## REST sözleşmesi
 
-| Yöntem | Yol | Girdi | Başarılı yanıt | Hata |
+| Yöntem | Endpoint | Başarılı yanıt | Hata | Durum |
 | --- | --- | --- | --- | --- |
-| GET | `/health` | — | `200`, `status: "ok"`, ISO 8601 biçiminde UTC `time` ve metin olarak `student` | — |
-| GET | `/events` | İsteğe bağlı `?category=Atölye` | `200`, etkinlik dizisi. Filtre için tam eşleşme aranır. Eşleşme yoksa `[]` döner. | — |
-| GET | `/events/:id` | Örnek kimlik `event-2` | `200`, etkinlik nesnesi | `404`, `{"error":{"message":"Event not found"}}` |
-| POST | `/events` | `Content-Type: application/json` | `201`, sunucunun ürettiği `id` ile etkinlik nesnesi ve detay yolunu içeren `Location` başlığı | `400`, `error.message` içinde eksik alan veya geçersiz JSON hatası |
+| GET | /health | 200 | - | Çalışıyor |
+| GET | /events | 200 | - | Çalışıyor |
+| GET | /events?search=atölye | 200 | - | Çalışıyor |
+| GET | /events?category=Atölye | 200 | - | Çalışıyor |
+| GET | /events?search=atölye&category=Atölye | 200 | - | Çalışıyor |
+| GET | /events/upcoming | 200 | - | Çalışıyor |
+| GET | /events/:id | 200 | 404 | Çalışıyor |
+| POST | /events | 201 | 400 | Çalışıyor |
+| PATCH | /events/:id | 200 | 400, 404 | Çalışıyor |
+| DELETE | /events/:id | 204 | 404 | Çalışıyor |
 
-POST isteğinde `title`, `category` ve `date` boş olmayan metin olmalıdır. `capacity` varsayılan olarak `0`, `time`, `location` ve `description` ise boş metindir. Örnek biçimler tarih için `YYYY-MM-DD`, saat için `HH:mm` şeklindedir.
+## Veri doğrulama
+
+- title, category ve date zorunludur.
+- Başlıktaki gereksiz boşluklar trim ile temizlenir.
+- Kapasite negatif olamaz.
+- Kategoriler: Seminer, Atölye, Söyleşi, Yarışma.
+- API tarih biçimi GG-AA-YYYY şeklindedir.
+- Tarihler MongoDB'de Date türünde saklanır.
+- createdAt ve updatedAt otomatik oluşturulur.
+- PATCH yalnızca gönderilen alanları günceller.
+- _id, createdAt, updatedAt ve __v değiştirilemez.
+- DELETE başarılı olduğunda 204 ve boş yanıt döner.
+
+## Örnek POST isteği
 
 ```json
 {
   "title": "Git Geçmişi ve Kod İnceleme Atölyesi",
   "category": "Atölye",
-  "date": "2026-12-10",
+  "date": "10-12-2026",
   "capacity": 28,
   "time": "14:00",
   "location": "Yazılım Laboratuvarı B-204",
-  "description": "Katılımcılar küçük bir değişikliği commit edip eşli kod incelemesi yapacak."
+  "description": "Katılımcılar eşli kod incelemesi yapacak."
 }
 ```
 
-## Testler
+## Örnek PATCH isteği
 
-`npm test` geçici bir sunucuda HTTP testlerini çalıştırır.
+```json
+{
+  "capacity": 55
+}
+```
 
-Postman’da [Kampüs API koleksiyonunu](requests/kampus-api.json) içe aktarın ve yeni başlatılmış sunucuda sırayla çalıştırın. Farklı bir port kullanıyorsanız koleksiyonun `baseUrl` değişkenini güncelleyin.
+## Hata yanıtı
 
-| İstek | Beklenen sonuç |
-| --- | --- |
-| `GET /health` | 200, sunucu durumu, zaman ve öğrenci numarası |
-| `GET /events` | 200, altı başlangıç kaydı |
-| `GET /events/event-2` | 200, `event-2` |
-| `GET /events/yok` | 404, etkinlik bulunamadı |
-| `POST /events`, tam JSON gövdesi | 201, yeni kimlik |
-| `POST /events`, yalnızca `title` | 400, eksik zorunlu alanlar |
+```json
+{
+  "error": {
+    "message": "Event not found"
+  }
+}
+```
 
-Koleksiyonu yeniden çalıştırmadan önce sunucuyu yeniden başlatın. Başarılı POST isteği listeye bir kayıt ekler.
+## Postman ve Newman testleri
+
+Postman koleksiyonu: requests/kampus-api.json
+
+Test sonuçları: requests/run-results.json
+
+Collection Runner sonuçları:
+
+- Toplam istek: 18
+- Toplam test: 45
+- Başarılı test: 45
+- Başarısız test: 0
+- Hata: 0
+
+Newman kurulumu:
+
+```bash
+npm i -g newman
+```
+
+Backend çalışırken öğretmenin test koleksiyonunu çalıştırma:
+
+```bash
+newman run https://webdersi.vercel.app/test.json
+```
+
+JSON test raporu oluşturma:
+
+```bash
+newman run https://webdersi.vercel.app/test.json -r cli,json --reporter-json-export requests/run-results.json
+```
+
+## Güvenlik
+
+.env ve node_modules GitHub'a yüklenmez.
+MongoDB bağlantı bilgileri ortam değişkenlerinden okunur.
+
+## Sprint 9
+
+- MongoDB kalıcı veri saklama
+- PATCH ile etkinlik güncelleme
+- DELETE ile etkinlik silme
+- Başlığa göre arama
+- Kategori filtreleme
+- Yaklaşan etkinlikleri listeleme
+- Postman ve Newman otomatik testleri
+
+Frontend dosyaları bu sprintte değiştirilmemiştir.

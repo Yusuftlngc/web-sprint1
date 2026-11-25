@@ -1,5 +1,6 @@
 
 import mongoose from "mongoose";
+import { formatDate, parseDate } from "../utils/date.js";
 
 const eventSchema = new mongoose.Schema(
   {
@@ -7,14 +8,19 @@ const eventSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
+      maxlength: 100,
     },
     category: {
       type: String,
       required: true,
+      enum: ["Seminer", "Atölye", "Söyleşi", "Yarışma"],
     },
     date: {
-      type: String,
+      type: Date,
       required: true,
+      set: parseDate,
+      get: formatDate,
     },
     time: {
       type: String,
@@ -32,6 +38,7 @@ const eventSchema = new mongoose.Schema(
     description: {
       type: String,
       default: "",
+      maxlength: 500,
     },
     image: {
       type: String,
@@ -40,6 +47,8 @@ const eventSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { getters: true },
+    id: false,
   }
 );
 

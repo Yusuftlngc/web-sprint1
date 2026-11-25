@@ -1,123 +1,186 @@
 
 import mongoose from "mongoose";
 import Event from "../models/event-model.js";
+import { todayStart } from "../utils/date.js";
 
-function formatEvent(event) {
-  const data = event.toObject();
+const KORUNAN_ALANLAR = [
+  "_id",
+  "createdAt",
+  "updatedAt",
+  "__v",
+];
 
-  return {
-    ...data,
-    id: event._id.toString(),
-  };
+function notFound(res) {
+  return res.status(404).json({
+    error: { message: "Event not found" },
+  });
+}
+
+function handleError(err, res, next) {
+  if (
+    err.name === "ValidationError" ||
+    err.name === "CastError"
+  ) {
+    return res.status(400).json({
+      error: { message: err.message },
+    });
+  }
+
+  next(err);
 }
 
 // GET /events
-export async function getEvents(req, res) {
+export async function getEvents(req, res, next) {
   try {
-    const { category } = req.query;
+    const { category, search } = req.query;
+    const filter = {};
 
-    const filter = category ? { category } : {};
+    if (typeof category === "string" && category) {
+      filter.category = category;
+    }
+
+    if (typeof search === "string" && search) {
+      const guvenli = search.replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&"
+      );
+
+      filter.title = {
+        $regex: guvenli,
+        $options: "i",
+      };
+    }
 
     const events = await Event.find(filter).sort({
       date: 1,
     });
 
-    res.status(200).json(events.map(formatEvent));
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: {
-        message: "Etkinlikler getirilemedi",
-      },
-    });
+    res.json(events);
+  } catch (err) {
+    next(err);
   }
 }
 
 // GET /events/:id
-export async function getEventById(req, res) {
+export async function getEventById(req, res, next) {
   try {
-    const { id } = req.params;
-
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(404).json({
-        error: {
-          message: "Event not found",
-        },
-      });
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return notFound(res);
     }
 
-    const event = await Event.findById(id);
+    const event = await Event.findById(req.params.id);
 
-    if (!event) {
-      return res.status(404).json({
-        error: {
-          message: "Event not found",
-        },
-      });
-    }
+    if (!event) return notFound(res);
 
-    res.status(200).json(formatEvent(event));
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      error: {
-        message: "Etkinlik getirilemedi",
-      },
-    });
+    res.json(event);
+  } catch (err) {
+    next(err);
   }
 }
 
 // POST /events
-export async function createEvent(req, res) {
+export async function createEvent(req, res, next) {
   try {
-    const {
-      title,
-      category,
-      date,
-      time,
-      location,
-      capacity,
-      description,
-      image,
-    } = req.body ?? {};
+    const event = await Event.create(req.body ?? {});
 
-    if (!title || !category || !date) {
+    res.status(201).json(event);
+  } catch (err) {
+    handleError(err, res, next);
+  }
+}
+
+// PATCH /events/:id
+export async function updateEvent(req, res, next) {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return notFound(res);
+    }
+
+    const body = req.body ?? {};
+
+    if (Object.keys(body).length === 0) {
+      return res.status(400).json({
+        error: { message: "Body is empty" },
+      });
+    }
+
+    const korunan = Object.keys(body).filter((k) =>
+      KORUNAN_ALANLAR.includes(k)
+    );
+
+    if (korunan.length > 0) {
       return res.status(400).json({
         error: {
-          message: "title, category and date are required",
+          message: `${korunan.join(", ")} cannot be changed`,
         },
       });
     }
 
-    const event = await Event.create({
-      title,
-      category,
-      date,
-      time,
-      location,
-      capacity,
-      description,
-      image,
-    });
+    const izinli = [
+      "title",
+      "category",
+      "date",
+      "time",
+      "location",
+      "capacity",
+      "description",
+      "image",
+    ];
 
-    res.status(201).json(formatEvent(event));
-  } catch (error) {
-    console.error(error);
-
-    if (error.name === "ValidationError") {
+    if (Object.keys(body).some((k) => !izinli.includes(k))) {
       return res.status(400).json({
-        error: {
-          message: error.message,
-        },
+        error: { message: "Invalid update field" },
       });
     }
 
-    res.status(500).json({
-      error: {
-        message: "Etkinlik oluşturulamadı",
-      },
+    const event = await Event.findByIdAndUpdate(
+      req.params.id,
+      { $set: body },
+      {
+        returnDocument: "after",
+        runValidators: true,
+      }
+    );
+
+    if (!event) return notFound(res);
+
+    res.json(event);
+  } catch (err) {
+    handleError(err, res, next);
+  }
+}
+
+// DELETE /events/:id
+export async function deleteEvent(req, res, next) {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return notFound(res);
+    }
+
+    const event = await Event.findByIdAndDelete(
+      req.params.id
+    );
+
+    if (!event) return notFound(res);
+
+    res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+}
+
+// GET /events/upcoming
+export async function getUpcomingEvents(req, res, next) {
+  try {
+    const events = await Event.find({
+      date: { $gte: todayStart() },
+    }).sort({
+      date: 1,
+      time: 1,
     });
+
+    res.json(events);
+  } catch (err) {
+    next(err);
   }
 }

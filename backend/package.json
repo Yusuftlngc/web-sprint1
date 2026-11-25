@@ -1,12 +1,14 @@
+
 {
   "name": "kampus-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Kampüs Etkinlikleri Sprint 7 REST API",
+  "description": "Kampüs Etkinlikleri Sprint 9 REST API",
   "type": "module",
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "seed": "node src/seed.js",
     "test": "node --test"
   },
   "dependencies": {
